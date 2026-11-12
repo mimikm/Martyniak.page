@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>martyniak.page</title>
+<meta name="description" content="Dom Martyniak — home lab, Home Assistant cards and energy tinkering.">
+<meta property="og:title" content="martyniak.page">
+<meta property="og:description" content="Home lab, Home Assistant cards and energy tinkering.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.martyniak.page/">
+<meta name="theme-color" content="#07090c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='5' width='26' height='6' rx='1' fill='%2318202a'/%3E%3Crect x='3' y='13' width='26' height='6' rx='1' fill='%2318202a'/%3E%3Crect x='3' y='21' width='26' height='6' rx='1' fill='%2318202a'/%3E%3Ccircle cx='24' cy='8' r='1.6' fill='%2334e39b'/%3E%3Ccircle cx='24' cy='16' r='1.6' fill='%2334e39b'/%3E%3Ccircle cx='24' cy='24' r='1.6' fill='%23ffb02e'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #07090c;
+    --ink: #e8edf2;
+    --muted: #8a96a3;
+    --green: #34e39b;
+    --amber: #ffb02e;
+    --line: rgba(255,255,255,.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); }
+  body {
+    font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  canvas#rack {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    display: block;
+  }
+  /* darken the centre so the text reads, keep hardware visible at the edges */
+  .shade {
+    position: fixed; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 50%, rgba(7,9,12,.88) 0%, rgba(7,9,12,.55) 55%, rgba(7,9,12,.15) 100%),
+      linear-gradient(180deg, rgba(7,9,12,.5), transparent 25%, transparent 75%, rgba(7,9,12,.6));
+  }
+  main {
+    position: relative; z-index: 1;
+    min-height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2.2rem; padding: 2rem; text-align: center;
+  }
+  h1 {
+    font-weight: 600;
+    font-size: clamp(2rem, 6vw, 3.6rem);
+    letter-spacing: -.02em;
+  }
+  h1 .dot { color: var(--green); }
+  .status {
+    display: inline-flex; align-items: center; gap: .55rem;
+    color: var(--muted); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase;
+  }
+  .status i {
+    width: .5rem; height: .5rem; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 10px var(--green);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: .35; } }
+  nav { display: flex; gap: .9rem; flex-wrap: wrap; justify-content: center; }
+  nav a {
+    display: inline-flex; align-items: center; gap: .6rem;
+    padding: .85rem 1.25rem;
+    color: var(--ink); text-decoration: none; font-size: .95rem;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: rgba(12,16,21,.7);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    transition: border-color .2s, transform .2s, background .2s;
+  }
+  nav a:hover, nav a:focus-visible {
+    border-color: var(--green); background: rgba(20,28,36,.85);
+    transform: translateY(-2px); outline: none;
+  }
+  nav svg { width: 18px; height: 18px; flex: none; }
+  footer {
+    position: fixed; bottom: 1rem; left: 0; right: 0; z-index: 1;
+    text-align: center; color: rgba(138,150,163,.6); font-size: .72rem; letter-spacing: .08em;
+  }
+  @media (prefers-reduced-motion: reduce) { .status i { animation: none; } }
+</style>
+</head>
+<body>
+<canvas id="rack" aria-hidden="true"></canvas>
+<div class="shade"></div>
+
+<main>
+  <span class="status"><i></i>all systems nominal</span>
+  <h1>martyniak<span class="dot">.</span>page</h1>
+  <nav>
+    <a href="https://github.com/mimikm" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+    <a href="https://octopusreferralcode.com" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Octopus referral
+    </a>
+  </nav>
+</main>
+
+<footer>&copy; <span id="y"></span> Dom Martyniak</footer>
+
+<script>
+document.getElementById('y').textContent = new Date().getFullYear();
+
+/* Server rack background, drawn in code: racks of 1U/2U servers, drive bays,
+   vents and status LEDs that blink like real disk/network activity. */
+(function () {
+  const cv = document.getElementById('rack');
+  const ctx = cv.getContext('2d');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W, H, dpr, units = [], leds = [];
+
+  // deterministic RNG so the layout stays the same between resizes
+  function rng(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+
+  function build() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    units = []; leds = [];
+    const r = rng(42);
+    const U = Math.max(18, Math.min(26, H / 34));      // height of 1U in px
+    const rackW = Math.max(300, Math.min(520, W * 0.36));
+    const gap = 26;
+    const cols = Math.ceil(W / (rackW + gap)) + 1;
+    const offset = (W - cols * (rackW + gap) + gap) / 2;
+
+    for (let c = 0; c < cols; c++) {
+      const x = offset + c * (rackW + gap);
+      let y = -r() * U * 3;
+      while (y < H + U) {
+        const roll = r();
+        const size = roll < 0.55 ? 1 : roll < 0.88 ? 2 : roll < 0.96 ? 4 : 1;
+        const kind = roll > 0.96 ? 'blank' : size === 1 ? (r() < 0.35 ? 'switch' : 'server1') : size === 2 ? 'server2' : 'storage';
+        const h = size * U;
+        units.push({ x, y, w: rackW, h, kind, seed: Math.floor(r() * 1e9) });
+        y += h + 2;
+      }
+    }
+    for (const u of units) addLeds(u);
+  }
+
+  function addLeds(u) {
+    const r = rng(u.seed);
+    const ear = 22;
+    if (u.kind === 'blank') return;
+    // power + health on the left ear
+    leds.push({ x: u.x + ear / 2, y: u.y + u.h / 2 - 4, col: 'g', mode: 'solid' });
+    leds.push({ x: u.x + ear / 2, y: u.y + u.h / 2 + 4, col: r() < 0.08 ? 'a' : 'b', mode: 'solid' });
+    if (u.kind === 'switch') {
+      const n = Math.floor((u.w - 140) / 13);
+      for (let i = 0; i < n; i++) {
+        if (r() < 0.75) leds.push({ x: u.x + 70 + i * 13 + 4, y: u.y + 4, col: r() < 0.85 ? 'g' : 'a', mode: 'act', rate: 0.05 + r() * 0.25, on: r() < .5 });
+      }
+    } else {
+      const bays = u.kind === 'server1' ? 8 : u.kind === 'server2' ? 12 : 24;
+      const rows = u.kind === 'storage' ? 3 : u.kind === 'server2' ? 2 : 1;
+      const perRow = bays / rows;
+      const bw = (u.w * 0.62) / perRow;
+      const bh = (u.h - 6) / rows;
+      for (let rr = 0; rr < rows; rr++) for (let i = 0; i < perRow; i++) {
+        leds.push({ x: u.x + ear + 10 + i * bw + bw - 6, y: u.y + 3 + rr * bh + bh / 2, col: r() < 0.9 ? 'g' : 'b', mode: 'act', rate: 0.02 + r() * 0.2, on: r() < .5 });
+      }
+    }
+  }
+
+  function drawStatic() {
+    // background wall
+    ctx.fillStyle = '#05070a'; ctx.fillRect(0, 0, W, H);
+    for (const u of units) {
+      const ear = 22;
+      // chassis
+      const g = ctx.createLinearGradient(0, u.y, 0, u.y + u.h);
+      g.addColorStop(0, '#1b222b'); g.addColorStop(.5, '#141a21'); g.addColorStop(1, '#0d1116');
+      ctx.fillStyle = g; ctx.fillRect(u.x, u.y, u.w, u.h);
+      ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.strokeRect(u.x + .5, u.y + .5, u.w - 1, u.h - 1);
+      // rack ears + screws
+      ctx.fillStyle = '#20272f';
+      ctx.fillRect(u.x, u.y, ear, u.h); ctx.fillRect(u.x + u.w - ear, u.y, ear, u.h);
+      ctx.fillStyle = '#39424c';
+      for (const sx of [u.x + ear / 2, u.x + u.w - ear / 2]) {
+        ctx.beginPath(); ctx.arc(sx, u.y + 5, 2, 0, 7); ctx.fill();
+        if (u.h > 30) { ctx.beginPath(); ctx.arc(sx, u.y + u.h - 5, 2, 0, 7); ctx.fill(); }
+      }
+      if (u.kind === 'blank') {
+        ctx.fillStyle = 'rgba(0,0,0,.35)';
+        for (let x = u.x + ear + 8; x < u.x + u.w - ear - 8; x += 6) ctx.fillRect(x, u.y + 4, 3, u.h - 8);
+        continue;
+      }
+      if (u.kind === 'switch') {
+        const n = Math.floor((u.w - 140) / 13);
+        for (let i = 0; i < n; i++) {
+          const px = u.x + 70 + i * 13;
+          ctx.fillStyle = '#05070a'; ctx.fillRect(px, u.y + 8, 10, u.h - 12);
+          ctx.fillStyle = '#2a323b'; ctx.fillRect(px + 2, u.y + 8, 6, 2);
+        }
+        // a few patch cables
+        const r = rng(u.seed + 7);
+        ctx.lineWidth = 3; ctx.lineCap = 'round';
+        const cableCols = ['#2c6fd1', '#d1a72c', '#3a9d5d', '#8a8f96'];
+        for (let i = 0; i < n; i++) if (r() < 0.5) {
+          const px = u.x + 75 + i * 13;
+          ctx.strokeStyle = cableCols[Math.floor(r() * cableCols.length)];
+          ctx.globalAlpha = .55;
+          ctx.beginPath(); ctx.moveTo(px, u.y + u.h - 4);
+          ctx.quadraticCurveTo(px + (r() - .5) * 30, u.y + u.h + 14, px + (r() - .5) * 40, u.y + u.h + 40);
+          ctx.stroke(); ctx.globalAlpha = 1;
+        }
+        continue;
+      }
+      // drive bays
+      const bays = u.kind === 'server1' ? 8 : u.kind === 'server2' ? 12 : 24;
+      const rows = u.kind === 'storage' ? 3 : u.kind === 'server2' ? 2 : 1;
+      const perRow = bays / rows;
+      const bw = (u.w * 0.62) / perRow;
+      const bh = (u.h - 6) / rows;
+      for (let rr = 0; rr < rows; rr++) for (let i = 0; i < perRow; i++) {
+        const bx = u.x + ear + 10 + i * bw, by = u.y + 3 + rr * bh;
+        ctx.fillStyle = '#0a0d11'; ctx.fillRect(bx, by, bw - 2, bh - 2);
+        ctx.fillStyle = '#232a33'; ctx.fillRect(bx + 2, by + 2, bw - 12, bh - 6);
+        ctx.fillStyle = 'rgba(0,0,0,.4)';
+        for (let k = bx + 4; k < bx + bw - 14; k += 3) ctx.fillRect(k, by + 4, 1, bh - 10);
+      }
+      // vent grille + label on the right
+      const vx = u.x + ear + 18 + u.w * 0.62, vw = u.w - (vx - u.x) - ear - 10;
+      ctx.fillStyle = 'rgba(0,0,0,.45)';
+      for (let yy = u.y + 5; yy < u.y + u.h - 5; yy += 4)
+        for (let xx = vx; xx < vx + vw - 20; xx += 4) ctx.fillRect(xx, yy, 2, 2);
+      ctx.fillStyle = '#2b333d'; ctx.fillRect(vx + vw - 16, u.y + u.h / 2 - 3, 12, 6);
+    }
+  }
+
+  const COL = { g: '52,227,155', a: '255,176,46', b: '64,156,255' };
+  let base;
+  function snapshot() { drawStatic(); base = ctx.getImageData(0, 0, cv.width, cv.height); }
+
+  function frame() {
+    ctx.putImageData(base, 0, 0);
+    for (const l of leds) {
+      if (l.mode === 'act' && !reduce && Math.random() < l.rate) l.on = !l.on;
+      const on = l.mode === 'solid' || l.on;
+      const c = COL[l.col];
+      ctx.fillStyle = on ? `rgba(${c},1)` : `rgba(${c},.12)`;
+      ctx.beginPath(); ctx.arc(l.x, l.y, 1.7, 0, 7); ctx.fill();
+      if (on) {
+        ctx.fillStyle = `rgba(${c},.18)`;
+        ctx.beginPath(); ctx.arc(l.x, l.y, 5, 0, 7); ctx.fill();
+      }
+    }
+    if (!reduce) setTimeout(() => requestAnimationFrame(frame), 70);
+  }
+
+  let t;
+  function init() { build(); snapshot(); frame(); }
+  addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => { build(); snapshot(); if (reduce) frame(); }, 150); });
+  init();
+})();
+</script>
+</body>
+</html>
